@@ -1,7 +1,7 @@
 {
   "name": "SR Garments Billing",
   "short_name": "SR Billing",
-  "start_url": "/",
+  "start_url": "/shop/shop.html",
   "display": "standalone",
   "background_color": "#0f0c29",
   "theme_color": "#f7971e",
