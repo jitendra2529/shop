@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+    <title>S.R Garments - Premium Bill Generator</title>
+    
+    <!-- ===== PWA META TAGS ===== -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SR Billing">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='80' fill='%23f7971e'/%3E%3Ctext x='256' y='340' font-size='280' text-anchor='middle' fill='white' font-family='Arial, sans-serif' font-weight='bold'%3ESR%3C/text%3E%3C/svg%3E">
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            padding: 20px;
+            background-attachment: fixed;
+        }
+
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+        }
+        .bg-animation .circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            animation: float 20s infinite ease-in-out;
+        }
+        .bg-animation .circle:nth-child(1) {
+            width: 500px;
+            height: 500px;
+            background: #f7971e;
+            top: -100px;
+            left: -100px;
+            animation-delay: 0s;
+        }
+        .bg-animation .circle:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: #ffd200;
+            bottom: -100px;
+            right: -100px;
+            animation-delay: -5s;
+        }
+        .bg-animation .circle:nth-child(3) {
+            width: 300px;
+            height: 300px;
+            background: #f7971e;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -10s;
+        }
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -50px) scale(1.1); }
+            50% { transform: translate(-30px, 30px) scale(0.9); }
+            75% { transform: translate(40px, 20px) scale(1.05); }
+        }
+
+        .app-header {
+            max-width: 1300px;
+            margin: 0 auto 25px auto;
+            background: rgba(255,255,255,0.08);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 18px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        .app-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, rgba(247, 151, 30, 0.1), rgba(255, 210, 0, 0.05));
+            border-radius: 24px;
+        }
+        .app-header .brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        .app-header .brand h1 {
+            color: white;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+        .app-header .brand h1 span {
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .app-header .brand small {
+            color: rgba(255,255,255,0.5);
+            font-size: 11px;
+            display: block;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+        .header-badge {
+            background: rgba(255,255,255,0.08);
+            padding: 8px 22px;
+            border-radius: 30px;
+            color: rgba(255,255,255,0.8);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border: 1px solid rgba(255,255,255,0.06);
+            position: relative;
+            z-index: 1;
+        }
+        .header-badge i {
+            color: #ffd200;
+        }
+        @media (max-width: 600px) {
+            .app-header { flex-direction: column; gap: 12px; text-align: center; padding: 15px; }
+            .app-header .brand h1 { font-size: 20px; }
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 25px;
+        }
+        @media (max-width: 1000px) {
+            .container { grid-template-columns: 1fr; }
+        }
+
+        .input-panel {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 28px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+        }
+        .input-panel h2 {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            border-bottom: 2px solid rgba(247, 151, 30, 0.3);
+            padding-bottom: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .input-panel h2 i {
+            color: #ffd200;
+        }
+
+        .section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.9);
+            margin: 18px 0 12px 0;
+            padding: 8px 14px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-left: 3px solid #ffd200;
+        }
+        .section-title i {
+            color: #ffd200;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            margin-bottom: 5px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+        .form-group label .required {
+            color: #ff6b6b;
+            margin-left: 3px;
+        }
+        .form-group input, 
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 11px 16px;
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+            font-size: 14px;
+            transition: 0.3s;
+            background: rgba(255,255,255,0.06);
+            color: white;
+            font-weight: 400;
+        }
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255,255,255,0.3);
+        }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #ffd200;
+            outline: none;
+            background: rgba(255,255,255,0.1);
+            box-shadow: 0 0 0 4px rgba(255, 210, 0, 0.08);
+        }
+        .form-group select option {
+            background: #1a1a2e;
+            color: white;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+        @media (max-width: 500px) {
+            .form-row { grid-template-columns: 1fr; }
+            .form-row-3 { grid-template-columns: 1fr 1fr; }
+            .input-panel { padding: 18px; }
+            .bill-panel { padding: 18px; }
+            #billContent { padding: 16px; }
+        }
+
+        .product-entry {
+            background: rgba(255,255,255,0.04);
+            border-radius: 14px;
+            padding: 16px;
+            margin: 12px 0;
+            border: 1px dashed rgba(255, 210, 0, 0.2);
+        }
+
+        .btn {
+            padding: 11px 22px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            color: #1a1a2e;
+            box-shadow: 0 4px 20px rgba(247, 151, 30, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 35px rgba(247, 151, 30, 0.4);
+        }
+        .btn-success {
+            background: linear-gradient(135deg, #00b894, #00a381);
+            color: white;
+        }
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 184, 148, 0.3);
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+        }
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3);
+        }
+        .btn-warning {
+            background: linear-gradient(135deg, #fdcb6e, #f39c12);
+            color: #1a1a2e;
+        }
+        .btn-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(253, 203, 110, 0.3);
+        }
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            box-shadow: 0 4px 20px rgba(37, 211, 102, 0.25);
+        }
+        .btn-whatsapp:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 35px rgba(37, 211, 102, 0.35);
+        }
+        .btn-remove {
+            background: rgba(255,107,107,0.15);
+            color: #ff6b6b;
+            padding: 4px 12px;
+            font-size: 12px;
+            border-radius: 8px;
+        }
+        .btn-remove:hover {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .product-list {
+            margin-top: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .product-list::-webkit-scrollbar {
+            width: 4px;
+        }
+        .product-list::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        .product-list::-webkit-scrollbar-thumb {
+            background: #ffd200;
+            border-radius: 10px;
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.05);
+            padding: 10px 16px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            border-left: 3px solid #ffd200;
+            transition: 0.2s;
+        }
+        .product-item:hover {
+            background: rgba(255,255,255,0.08);
+        }
+        .product-item .info {
+            font-size: 13px;
+            color: rgba(255,255,255,0.85);
+        }
+        .product-item .info strong {
+            color: white;
+        }
+        .product-item .price-tag {
+            font-weight: 700;
+            color: #ffd200;
+        }
+        .badge {
+            background: rgba(255,210,0,0.15);
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 10px;
+            color: #ffd200;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .payment-details-box {
+            background: rgba(255,255,255,0.04);
+            border-radius: 14px;
+            padding: 16px;
+            margin: 10px 0;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .bill-panel {
+            background: rgba(255,255,255,0.06);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 28px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+        }
+        .bill-panel h2 {
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            border-bottom: 2px solid rgba(247, 151, 30, 0.3);
+            padding-bottom: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .bill-panel h2 i {
+            color: #ffd200;
+        }
+
+        #billContent {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            min-height: 400px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .bill-header {
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 3px double #f7971e;
+            margin-bottom: 18px;
+        }
+        .bill-header h1 {
+            font-size: 28px;
+            color: #1a1a2e;
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+        .bill-header h1 span {
+            color: #f7971e;
+        }
+        .bill-header .store-details {
+            font-size: 12px;
+            color: #8a7aa8;
+            margin-top: 4px;
+        }
+
+        .bill-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4px 20px;
+            font-size: 13px;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee8f5;
+            margin-bottom: 12px;
+        }
+        .bill-meta .label {
+            color: #8a7aa8;
+            font-weight: 500;
+        }
+        .bill-meta .value {
+            color: #1a1a2e;
+            font-weight: 600;
+        }
+
+        .bill-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin: 10px 0;
+        }
+        .bill-table th {
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            padding: 8px 10px;
+            text-align: left;
+            color: #1a1a2e;
+            font-weight: 700;
+            border-bottom: 2px solid #f7971e;
+        }
+        .bill-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #eee8f5;
+            color: #1a1a2e;
+        }
+        .bill-table .text-right {
+            text-align: right;
+        }
+
+        .bill-total {
+            margin-top: 12px;
+            border-top: 2px solid #f7971e;
+            padding-top: 12px;
+        }
+        .bill-total .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            font-size: 14px;
+            color: #1a1a2e;
+        }
+        .bill-total .row.grand {
+            font-size: 20px;
+            font-weight: 800;
+            color: #f7971e;
+            border-top: 3px double #f7971e;
+            padding-top: 10px;
+            margin-top: 6px;
+        }
+
+        .bill-payment {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f4ff;
+            border-radius: 12px;
+            border: 2px solid #f0ebf5;
+        }
+        .bill-payment .payment-title {
+            font-weight: 700;
+            font-size: 15px;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+            border-bottom: 2px solid #f0ebf5;
+            padding-bottom: 6px;
+        }
+        .bill-payment .row {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            font-size: 14px;
+            color: #1a1a2e;
+        }
+        .bill-payment .row.paid {
+            color: #00a381;
+            font-weight: 700;
+            font-size: 16px;
+            border-top: 1px dashed #00a381;
+            padding-top: 8px;
+            margin-top: 4px;
+        }
+        .bill-payment .row.balance {
+            color: #ee5a24;
+            font-weight: 700;
+            font-size: 16px;
+            border-top: 1px dashed #ee5a24;
+            padding-top: 8px;
+            margin-top: 4px;
+        }
+        .bill-payment .row.status {
+            font-weight: 700;
+            font-size: 15px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            margin-top: 6px;
+            justify-content: center;
+            border: none;
+        }
+        .bill-payment .row.status.fully-paid {
+            background: #d4edda;
+            color: #155724;
+        }
+        .bill-payment .row.status.partial {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .bill-payment .row.status.pending {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .bill-notes {
+            margin-top: 15px;
+            padding: 12px 15px;
+            background: #fffbf0;
+            border-radius: 12px;
+            border: 2px solid #f0dcc8;
+        }
+        .bill-notes .notes-title {
+            font-weight: 700;
+            font-size: 14px;
+            color: #1a1a2e;
+            margin-bottom: 4px;
+        }
+        .bill-notes .notes-content {
+            font-size: 13px;
+            color: #3d2c5e;
+            white-space: pre-wrap;
+        }
+
+        .bill-footer {
+            text-align: center;
+            margin-top: 18px;
+            padding-top: 12px;
+            border-top: 2px dashed #ddd;
+            font-size: 13px;
+            color: #8a7aa8;
+        }
+
+        .bill-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+        .bill-actions .btn {
+            flex: 1;
+            justify-content: center;
+            min-width: 100px;
+        }
+
+        .empty-bill {
+            text-align: center;
+            padding: 50px 0;
+            color: #aaa;
+            font-size: 16px;
+        }
+        .empty-bill i {
+            font-size: 50px;
+            opacity: 0.3;
+            display: block;
+            margin-bottom: 12px;
+            color: #f7971e;
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        .loading-overlay.active {
+            display: flex;
+        }
+        .loading-spinner {
+            background: #1a1a2e;
+            padding: 40px 50px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .loading-spinner i {
+            font-size: 50px;
+            color: #ffd200;
+            animation: spin 1s linear infinite;
+        }
+        .loading-spinner p {
+            margin-top: 12px;
+            font-weight: 600;
+            color: rgba(255,255,255,0.8);
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .pwa-fab {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 9999;
+            background: linear-gradient(135deg, #f7971e, #ffd200);
+            color: #1a1a2e;
+            padding: 14px 24px;
+            border-radius: 60px;
+            border: none;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 30px rgba(247, 151, 30, 0.5);
+            font-family: 'Poppins', sans-serif;
+        }
+        .pwa-fab:hover {
+            transform: scale(1.05);
+        }
+        @media (max-width: 600px) {
+            .pwa-fab {
+                bottom: 20px;
+                right: 20px;
+                padding: 10px 16px;
+                font-size: 13px;
+                border-radius: 50px;
+            }
+        }
+
+        @media print {
+            body { background: white !important; padding: 0 !important; margin: 0 !important; }
+            .app-header, .input-panel, .bill-actions, .no-print, .bg-animation, .loading-overlay, .pwa-fab {
+                display: none !important;
+            }
+            .container { display: block !important; max-width: 100% !important; gap: 0 !important; margin: 0 !important; padding: 0 !important; }
+            .bill-panel { box-shadow: none !important; border-radius: 0 !important; padding: 5px !important; background: white !important; margin: 0 !important; }
+            #billContent { padding: 15px !important; border-radius: 0 !important; box-shadow: none !important; background: white !important; min-height: auto !important; }
+            .bill-table th { background: #f7971e !important; color: white !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .bill-payment .row.status.fully-paid { background: #d4edda !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .bill-payment .row.status.partial { background: #fff3cd !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .bill-payment .row.status.pending { background: #f8d7da !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .bill-payment { background: #f8f4ff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .bill-notes { background: #fffbf0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+        }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: #ffd200; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<div class="bg-animation">
+    <div class="circle"></div>
+    <div class="circle"></div>
+    <div class="circle"></div>
+</div>
+
+<div class="app-header no-print">
+    <div class="brand">
+        <div>
+            <h1>S.R <span>GARMENTS</span></h1>
+            <small>PREMIUM BILLING SYSTEM</small>
+        </div>
+    </div>
+    <div class="header-badge">
+        <i class="fas fa-clock"></i>
+        <span id="currentTime"></span>
+    </div>
+</div>
+
+<div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+        <i class="fas fa-spinner"></i>
+        <p>Generating PDF... Please wait</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="input-panel no-print">
+        <h2><i class="fas fa-pencil-alt"></i> Enter Bill Details</h2>
+
+        <div class="section-title"><i class="fas fa-user"></i> Customer Details</div>
+        
+        <div class="form-group">
+            <label>Customer Name <span class="required">*</span></label>
+            <input type="text" id="custName" placeholder="Enter customer name" />
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Mobile Number <span class="required">*</span></label>
+                <input type="text" id="custPhone" placeholder="9876543210" maxlength="10" />
+            </div>
+            <div class="form-group">
+                <label>Date <span class="required">*</span></label>
+                <input type="date" id="billDate" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Address</label>
+            <input type="text" id="custAddress" placeholder="Enter address" />
+        </div>
+
+        <div class="section-title"><i class="fas fa-tshirt"></i> Product Details</div>
+
+        <div class="product-entry">
+            <div class="form-row-3">
+                <div class="form-group">
+                    <label>Name <span class="required">*</span></label>
+                    <input type="text" id="productName" placeholder="e.g. T-Shirt" />
+                </div>
+                <div class="form-group">
+                    <label>Size</label>
+                    <input type="text" id="productSize" placeholder="S/M/L/XL" />
+                </div>
+                <div class="form-group">
+                    <label>Color</label>
+                    <input type="text" id="productColor" placeholder="e.g. Black" />
+                </div>
+            </div>
+            <div class="form-row-3">
+                <div class="form-group">
+                    <label>Quantity <span class="required">*</span></label>
+                    <input type="number" id="productQty" value="1" min="1" />
+                </div>
+                <div class="form-group">
+                    <label>Price (₹) <span class="required">*</span></label>
+                    <input type="number" id="productPrice" placeholder="Enter price" min="1" />
+                </div>
+                <div class="form-group" style="display: flex; align-items: flex-end;">
+                    <button class="btn btn-success" id="addProductBtn" style="width:100%;">
+                        <i class="fas fa-plus"></i> Add
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-list" id="productList">
+            <p style="color: rgba(255,255,255,0.4); font-size: 13px; padding: 8px 0;">No products added yet.</p>
+        </div>
+
+        <div class="section-title"><i class="fas fa-calculator"></i> Discount & Tax</div>
+
+        <div class="form-row-3">
+            <div class="form-group">
+                <label>Discount (%)</label>
+                <input type="number" id="discountPercent" value="0" min="0" max="100" />
+            </div>
+            <div class="form-group">
+                <label>Discount (₹)</label>
+                <input type="number" id="discountAmount" value="0" min="0" />
+            </div>
+            <div class="form-group">
+                <label>GST (%)</label>
+                <input type="number" id="gstPercent" value="0" min="0" max="100" />
+            </div>
+        </div>
+
+        <div class="section-title"><i class="fas fa-credit-card"></i> Payment Details</div>
+
+        <div class="payment-details-box">
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Payment Mode <span class="required">*</span></label>
+                    <select id="paymentMode">
+                        <option value="Cash">💵 Cash</option>
+                        <option value="UPI">📱 UPI</option>
+                        <option value="Card">💳 Card</option>
+                        <option value="Net Banking">🏦 Net Banking</option>
+                        <option value="Bank Transfer">🏧 Bank Transfer</option>
+                        <option value="Online Wallet">📲 Online Wallet</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount Paid (₹) <span class="required">*</span></label>
+                    <input type="number" id="amountPaid" placeholder="Enter amount paid" min="0" />
+                </div>
+            </div>
+
+            <div id="onlinePaymentDetails" style="display: none;">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Transaction ID / UPI ID</label>
+                        <input type="text" id="transactionId" placeholder="Enter transaction ID" />
+                    </div>
+                    <div class="form-group">
+                        <label>Payment Gateway</label>
+                        <select id="paymentGateway">
+                            <option value="">Select Gateway</option>
+                            <option value="Google Pay">Google Pay</option>
+                            <option value="PhonePe">PhonePe</option>
+                            <option value="Paytm">Paytm</option>
+                            <option value="Amazon Pay">Amazon Pay</option>
+                            <option value="Razorpay">Razorpay</option>
+                            <option value="PayPal">PayPal</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-title"><i class="fas fa-sticky-note"></i> Extra Notes</div>
+
+        <div class="form-group">
+            <label>Notes / Special Instructions</label>
+            <textarea id="extraNotes" rows="2" placeholder="Enter any additional information..." style="resize: vertical;"></textarea>
+        </div>
+
+        <div style="display: flex; gap: 12px; margin-top: 5px;">
+            <button class="btn btn-primary" id="generateBillBtn" style="flex:2;">
+                <i class="fas fa-file-invoice"></i> Generate Bill
+            </button>
+            <button class="btn btn-danger" id="clearAllBtn" style="flex:1;">
+                <i class="fas fa-trash"></i> Clear
+            </button>
+        </div>
+    </div>
+
+    <div class="bill-panel" id="billPanel">
+        <h2><i class="fas fa-receipt"></i> Bill</h2>
+
+        <div id="billContent">
+            <div class="empty-bill">
+                <i class="fas fa-receipt"></i>
+                Add products and generate bill
+            </div>
+        </div>
+
+        <div class="bill-actions no-print">
+            <button class="btn btn-primary" id="printBillBtn"><i class="fas fa-print"></i> Print PDF</button>
+            <button class="btn btn-whatsapp" id="whatsappShareBtn"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+            <button class="btn btn-warning" id="resetBillBtn"><i class="fas fa-redo"></i> Reset</button>
+        </div>
+    </div>
+</div>
+
+<button class="pwa-fab" id="installPwaBtn">
+    <i class="fas fa-download"></i> Install App
+</button>
+
+<script>
+// ============================================================
+//  PWA INSTALLATION
+// ============================================================
+let deferredPrompt;
+const installBtn = document.getElementById('installPwaBtn');
+
+if (window.matchMedia('(display-mode: standalone)').matches) {
+    installBtn.style.display = 'none';
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'flex';
+});
+
+installBtn.addEventListener('click', async () => {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const result = await deferredPrompt.userChoice;
+        if (result.outcome === 'accepted') {
+            installBtn.style.display = 'none';
+            alert('✅ App installed successfully! 🎉');
+        }
+        deferredPrompt = null;
+    } else {
+        alert('📱 Install karne ke liye:\nChrome: Menu → "Install App"\nSafari: Share → "Add to Home Screen"');
+    }
+});
+
+window.addEventListener('appinstalled', () => {
+    installBtn.style.display = 'none';
+    alert('✅ App installed successfully! 🎉');
+});
+
+// ============================================================
+//  SERVICE WORKER REGISTER
+// ============================================================
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/shop/sw.js')
+        .then(reg => console.log('✅ Service Worker registered!'))
+        .catch(err => console.log('❌ Service Worker failed:', err));
+}
+
+// ============================================================
+//  MAIN APP LOGIC
+// ============================================================
+let products = [];
+
+const productListEl = document.getElementById('productList');
+const billContentEl = document.getElementById('billContent');
+const loadingOverlay = document.getElementById('loadingOverlay');
+
+const custName = document.getElementById('custName');
+const custPhone = document.getElementById('custPhone');
+const custAddress = document.getElementById('custAddress');
+const billDate = document.getElementById('billDate');
+const productName = document.getElementById('productName');
+const productSize = document.getElementById('productSize');
+const productColor = document.getElementById('productColor');
+const productQty = document.getElementById('productQty');
+const productPrice = document.getElementById('productPrice');
+const discountPercent = document.getElementById('discountPercent');
+const discountAmount = document.getElementById('discountAmount');
+const gstPercent = document.getElementById('gstPercent');
+const paymentMode = document.getElementById('paymentMode');
+const amountPaid = document.getElementById('amountPaid');
+const transactionId = document.getElementById('transactionId');
+const paymentGateway = document.getElementById('paymentGateway');
+const onlinePaymentDetails = document.getElementById('onlinePaymentDetails');
+const extraNotes = document.getElementById('extraNotes');
+
+const addProductBtn = document.getElementById('addProductBtn');
+const generateBillBtn = document.getElementById('generateBillBtn');
+const clearAllBtn = document.getElementById('clearAllBtn');
+const printBillBtn = document.getElementById('printBillBtn');
+const resetBillBtn = document.getElementById('resetBillBtn');
+const whatsappShareBtn = document.getElementById('whatsappShareBtn');
+
+// ============================================================
+//  FUNCTIONS
+// ============================================================
+
+function setDefaultDate() {
+    const today = new Date().toISOString().split('T')[0];
+    billDate.value = today;
+}
+setDefaultDate();
+
+function updateTime() {
+    const now = new Date();
+    document.getElementById('currentTime').textContent = now.toLocaleString('en-IN', {
+        day: '2-digit', month: 'short', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+    });
+}
+updateTime();
+setInterval(updateTime, 60000);
+
+// Validation
+custPhone.addEventListener('input', function() {
+    this.value = this.value.replace(/[^0-9]/g, '');
+    if (this.value.length > 10) this.value = this.value.slice(0, 10);
+});
+
+paymentMode.addEventListener('change', function() {
+    const onlineModes = ['UPI', 'Card', 'Net Banking', 'Bank Transfer', 'Online Wallet'];
+    onlinePaymentDetails.style.display = onlineModes.includes(this.value) ? 'block' : 'none';
+});
+
+// Render product list
+function renderProductList() {
+    if (products.length === 0) {
+        productListEl.innerHTML = '<p style="color: rgba(255,255,255,0.4); font-size: 13px; padding: 8px 0;">No products added yet.</p>';
+        return;
+    }
+    let html = '';
+    products.forEach((p, idx) => {
+        html += `
+            <div class="product-item">
+                <div class="info">
+                    <strong>${p.name}</strong> 
+                    ${p.size ? `<span class="badge">${p.size}</span>` : ''}
+                    ${p.color ? `<span class="badge">${p.color}</span>` : ''}
+                    <span>× ${p.qty}</span>
+                </div>
+                <div>
+                    <span class="price-tag">₹${(p.price * p.qty).toFixed(2)}</span>
+                    <button class="btn btn-remove" data-idx="${idx}" style="margin-left: 8px;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    productListEl.innerHTML = html;
+    document.querySelectorAll('.btn-remove').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const idx = parseInt(this.dataset.idx);
+            products.splice(idx, 1);
+            renderProductList();
+        });
+    });
+}
+
+// Add product
+function addProduct() {
+    const name = productName.value.trim();
+    const size = productSize.value.trim();
+    const color = productColor.value.trim();
+    const qty = parseInt(productQty.value) || 1;
+    const price = parseFloat(productPrice.value) || 0;
+
+    if (!name) { alert('Please enter product name.'); productName.focus(); return; }
+    if (qty < 1) { alert('Quantity must be at least 1.'); productQty.focus(); return; }
+    if (price <= 0) { alert('Please enter a valid price.'); productPrice.focus(); return; }
+
+    products.push({ name, size, color, qty, price });
+    renderProductList();
+    productName.value = ''; productSize.value = ''; productColor.value = '';
+    productQty.value = '1'; productPrice.value = '';
+    productName.focus();
+}
+
+// Generate Bill
+function generateBill() {
+    if (products.length === 0) { alert('Please add at least one product.'); return; }
+
+    const name = custName.value.trim();
+    if (!name) { alert('Please enter customer name.'); custName.focus(); return; }
+
+    const phone = custPhone.value.trim();
+    if (phone && phone.length !== 10) { alert('Please enter exactly 10 digits for mobile number.'); custPhone.focus(); return; }
+
+    const date = billDate.value;
+    if (!date) { alert('Please select date.'); billDate.focus(); return; }
+
+    const paidAmount = parseFloat(amountPaid.value) || 0;
+
+    const customer = { name, phone: phone || 'N/A', address: custAddress.value.trim() || 'N/A', date };
+    const discPercent = parseFloat(discountPercent.value) || 0;
+    const discAmount = parseFloat(discountAmount.value) || 0;
+    const gst = parseFloat(gstPercent.value) || 0;
+
+    let subtotal = 0;
+    products.forEach(p => { subtotal += p.price * p.qty; });
+
+    const discountFromPercent = (subtotal * discPercent) / 100;
+    const totalDiscount = discountFromPercent + discAmount;
+    const afterDiscount = subtotal - totalDiscount;
+    const gstAmount = (afterDiscount * gst) / 100;
+    const grandTotal = afterDiscount + gstAmount;
+    const balance = grandTotal - paidAmount;
+
+    let paymentStatus = '', statusClass = '';
+    if (paidAmount === 0) { paymentStatus = '⚠️ Pending (No Payment Made)'; statusClass = 'pending'; }
+    else if (balance > 0) { paymentStatus = `⚠️ Partial Payment (₹${balance.toFixed(2)} remaining)`; statusClass = 'partial'; }
+    else if (balance === 0) { paymentStatus = '✅ Fully Paid'; statusClass = 'fully-paid'; }
+    else { paymentStatus = '✅ Overpaid (Extra payment received)'; statusClass = 'fully-paid'; }
+
+    const mode = paymentMode.value;
+    const onlineModes = ['UPI', 'Card', 'Net Banking', 'Bank Transfer', 'Online Wallet'];
+    const isOnline = onlineModes.includes(mode);
+    const txnId = transactionId.value.trim() || 'N/A';
+    const gateway = paymentGateway.value || 'N/A';
+    const notes = extraNotes.value.trim() || '';
+
+    let billHTML = `
+        <div class="bill-header">
+            <h1>S.R <span>GARMENTS</span></h1>
+            <div class="store-details">📍 Hathideh, Sri Madhopur, Sikar, Rajasthan 332707 • 📞 +91 9414906961</div>
+        </div>
+        <div class="bill-meta">
+            <div><span class="label">Date:</span> <span class="value">${customer.date}</span></div>
+            <div><span class="label">Customer:</span> <span class="value">${customer.name}</span></div>
+            <div><span class="label">Address:</span> <span class="value">${customer.address}</span></div>
+            <div><span class="label">Mobile:</span> <span class="value">${customer.phone}</span></div>
+        </div>
+        <table class="bill-table">
+            <thead><tr><th>#</th><th>Item</th><th>Size</th><th>Color</th><th class="text-right">Qty</th><th class="text-right">Price</th><th class="text-right">Total</th></tr></thead>
+            <tbody>`;
+
+    products.forEach((p, idx) => {
+        const total = p.price * p.qty;
+        billHTML += `<tr><td>${idx+1}</td><td>${p.name}</td><td>${p.size||'-'}</td><td>${p.color||'-'}</td><td class="text-right">${p.qty}</td><td class="text-right">₹${p.price.toFixed(2)}</td><td class="text-right">₹${total.toFixed(2)}</td></tr>`;
+    });
+
+    billHTML += `
+            </tbody>
+        </table>
+        <div class="bill-total">
+            <div class="row"><span>Subtotal</span><span>₹${subtotal.toFixed(2)}</span></div>
+            ${(discPercent > 0 || discAmount > 0) ? `<div class="row"><span>Discount</span><span>−₹${totalDiscount.toFixed(2)}</span></div>` : ''}
+            ${gst > 0 ? `<div class="row"><span>GST (${gst}%)</span><span>+₹${gstAmount.toFixed(2)}</span></div>` : ''}
+            <div class="row grand"><span>Grand Total</span><span>₹${grandTotal.toFixed(2)}</span></div>
+        </div>
+        <div class="bill-payment">
+            <div class="payment-title"><i class="fas fa-money-bill-wave"></i> Payment Details</div>
+            <div class="row"><span>Payment Mode</span><span><strong>${mode}</strong></span></div>
+            ${isOnline ? `<div class="row"><span>Transaction ID</span><span>${txnId}</span></div>` : ''}
+            ${isOnline && gateway !== 'N/A' ? `<div class="row"><span>Payment Gateway</span><span>${gateway}</span></div>` : ''}
+            <div class="row paid"><span>💰 Amount Paid</span><span>₹${paidAmount.toFixed(2)}</span></div>
+            ${balance > 0 ? `<div class="row balance"><span>📌 Balance Due</span><span>₹${balance.toFixed(2)}</span></div>` : ''}
+            ${balance < 0 ? `<div class="row paid"><span>🔄 Extra Payment (Refund)</span><span>₹${Math.abs(balance).toFixed(2)}</span></div>` : ''}
+            <div class="row status ${statusClass}"><span>${paymentStatus}</span></div>
+        </div>
+        ${notes ? `<div class="bill-notes"><div class="notes-title"><i class="fas fa-sticky-note"></i> Notes / Special Instructions</div><div class="notes-content">${notes.replace(/\n/g, '<br>')}</div></div>` : ''}
+        <div class="bill-footer"><p>Thank you for shopping with us! 🛍️</p><p style="font-size: 11px;">Items are not returnable after 7 days • All prices are inclusive of GST</p></div>
+    `;
+
+    billContentEl.innerHTML = billHTML;
+}
+
+// Print PDF
+function printPDF() {
+    const billContent = document.getElementById('billContent');
+    if (billContent.querySelector('.empty-bill')) {
+        alert('Please generate the bill first.');
+        return;
+    }
+    loadingOverlay.classList.add('active');
+    setTimeout(() => {
+        loadingOverlay.classList.remove('active');
+        window.print();
+    }, 800);
+}
+
+// Build WhatsApp Message
+function buildWhatsAppMessage() {
+    const customerName = document.getElementById('custName').value.trim() || 'Guest';
+    const date = document.getElementById('billDate').value;
+    const phone = document.getElementById('custPhone').value.trim() || 'N/A';
+    const address = document.getElementById('custAddress').value.trim() || 'N/A';
+    
+    let productList = '';
+    products.forEach((p, idx) => {
+        const total = p.price * p.qty;
+        productList += `${idx+1}. ${p.name}`;
+        if (p.size) productList += ` | Size: ${p.size}`;
+        if (p.color) productList += ` | Color: ${p.color}`;
+        productList += ` | Qty: ${p.qty} | ₹${p.price} = ₹${total.toFixed(2)}\n`;
+    });
+
+    let subtotal = 0;
+    products.forEach(p => { subtotal += p.price * p.qty; });
+    const discPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
+    const discAmount = parseFloat(document.getElementById('discountAmount').value) || 0;
+    const gst = parseFloat(document.getElementById('gstPercent').value) || 0;
+    const discountFromPercent = (subtotal * discPercent) / 100;
+    const totalDiscount = discountFromPercent + discAmount;
+    const afterDiscount = subtotal - totalDiscount;
+    const gstAmount = (afterDiscount * gst) / 100;
+    const grandTotal = afterDiscount + gstAmount;
+    const paidAmount = parseFloat(document.getElementById('amountPaid').value) || 0;
+    const balance = grandTotal - paidAmount;
+
+    let statusText = '';
+    if (paidAmount === 0) statusText = '⚠️ Pending (No Payment Made)';
+    else if (balance > 0) statusText = `⚠️ Partial Payment (₹${balance.toFixed(2)} remaining)`;
+    else if (balance === 0) statusText = '✅ Fully Paid';
+    else statusText = '✅ Overpaid';
+
+    const mode = document.getElementById('paymentMode').value;
+    const onlineModes = ['UPI', 'Card', 'Net Banking', 'Bank Transfer', 'Online Wallet'];
+    const isOnline = onlineModes.includes(mode);
+    const txnId = document.getElementById('transactionId').value.trim() || 'N/A';
+    const gateway = document.getElementById('paymentGateway').value || 'N/A';
+    const notes = document.getElementById('extraNotes').value.trim() || '';
+
+    let message = `🏪 *S.R GARMENTS* 🏪\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `📅 Date: ${date}\n`;
+    message += `👤 Customer: ${customerName}\n`;
+    message += `📱 Mobile: ${phone}\n`;
+    message += `📍 Address: ${address}\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `📋 *BILL DETAILS*\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += productList;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `💰 Subtotal: ₹${subtotal.toFixed(2)}\n`;
+    if (totalDiscount > 0) message += `💸 Discount: -₹${totalDiscount.toFixed(2)}\n`;
+    if (gst > 0) message += `🧾 GST (${gst}%): +₹${gstAmount.toFixed(2)}\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `💎 *Grand Total: ₹${grandTotal.toFixed(2)}*\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `💳 *PAYMENT DETAILS*\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `Mode: ${mode}\n`;
+    if (isOnline) {
+        if (txnId !== 'N/A') message += `Transaction ID: ${txnId}\n`;
+        if (gateway !== 'N/A') message += `Gateway: ${gateway}\n`;
+    }
+    message += `💰 Amount Paid: ₹${paidAmount.toFixed(2)}\n`;
+    if (balance > 0) message += `📌 Balance Due: ₹${balance.toFixed(2)}\n`;
+    if (balance < 0) message += `🔄 Extra Payment (Refund): ₹${Math.abs(balance).toFixed(2)}\n`;
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `📊 Status: ${statusText}\n`;
+    if (notes) {
+        message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+        message += `📝 Notes: ${notes}\n`;
+    }
+    message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
+    message += `🙏 Thank you for shopping!\n`;
+    message += `📍 Hathideh, Sri Madhopur, Sikar\n`;
+    message += `📞 +91 9414906961`;
+
+    return message;
+}
+
+// WhatsApp Share
+function shareOnWhatsApp() {
+    const billContent = document.getElementById('billContent');
+    if (billContent.querySelector('.empty-bill')) {
+        alert('Please generate the bill first.');
+        return;
+    }
+
+    const phone = document.getElementById('custPhone').value.trim();
+    if (!phone || phone.length !== 10) {
+        alert('Please enter a valid 10-digit customer mobile number.');
+        document.getElementById('custPhone').focus();
+        return;
+    }
+
+    loadingOverlay.classList.add('active');
+    
+    setTimeout(() => {
+        loadingOverlay.classList.remove('active');
+        window.print();
+        
+        setTimeout(() => {
+            const message = buildWhatsAppMessage();
+            window.open(`https://wa.me/91${phone}?text=${encodeURIComponent(message)}`, '_blank');
+        }, 1500);
+    }, 800);
+}
+
+// Clear & Reset
+function clearAll() {
+    if (!confirm('Clear all products, customer details, and payment info?')) return;
+    products = [];
+    renderProductList();
+    custName.value = ''; custPhone.value = ''; custAddress.value = '';
+    setDefaultDate();
+    discountPercent.value = '0'; discountAmount.value = '0'; gstPercent.value = '0';
+    paymentMode.value = 'Cash'; amountPaid.value = '';
+    transactionId.value = ''; paymentGateway.value = '';
+    onlinePaymentDetails.style.display = 'none'; extraNotes.value = '';
+    billContentEl.innerHTML = `<div class="empty-bill"><i class="fas fa-receipt"></i>Add products and generate bill</div>`;
+}
+
+function resetBill() {
+    billContentEl.innerHTML = `<div class="empty-bill"><i class="fas fa-receipt"></i>Generate bill to see details</div>`;
+}
+
+// ============================================================
+//  EVENT LISTENERS
+// ============================================================
+addProductBtn.addEventListener('click', addProduct);
+['productName', 'productSize', 'productColor', 'productQty', 'productPrice'].forEach(id => {
+    document.getElementById(id).addEventListener('keypress', (e) => { if (e.key === 'Enter') addProduct(); });
+});
+generateBillBtn.addEventListener('click', generateBill);
+clearAllBtn.addEventListener('click', clearAll);
+printBillBtn.addEventListener('click', printPDF);
+resetBillBtn.addEventListener('click', resetBill);
+whatsappShareBtn.addEventListener('click', shareOnWhatsApp);
+
+console.log('🛍️ S.R Garments - Premium Bill Generator ready!');
+</script>
+</body>
+</html>
