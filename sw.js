@@ -1,9 +1,9 @@
 const CACHE_NAME = 'sr-v1';
 const urlsToCache = [
-  '/',
-  '/shop.html',
-  '/manifest.json',
-  '/sw.js'
+  '/shop/',
+  '/shop/shop.html',
+  '/shop/manifest.json',
+  '/shop/sw.js'
 ];
 
 self.addEventListener('install', event => {
