@@ -1503,6 +1503,40 @@ if ('serviceWorker' in navigator) {
 
     console.log('🛍️ S.R Garments - Premium Bill Generator ready!');
 </script>
+<script>
+// PWA Install Button
+let deferredPrompt;
+const installBtn = document.getElementById('installPwaBtn');
 
+if (window.matchMedia('(display-mode: standalone)').matches) {
+    if(installBtn) installBtn.style.display = 'none';
+}
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if(installBtn) installBtn.style.display = 'flex';
+});
+
+if(installBtn) {
+    installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const result = await deferredPrompt.userChoice;
+            if (result.outcome === 'accepted') {
+                installBtn.style.display = 'none';
+            }
+            deferredPrompt = null;
+        }
+    });
+}
+
+// Service Worker Register
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('✅ Service Worker registered!'))
+        .catch(err => console.log('❌ Service Worker failed:', err));
+}
+</script>
 </body>
 </html>
