@@ -1,7 +1,7 @@
 const CACHE_NAME = 'sr-v1';
 const urlsToCache = [
   '/',
-  '/index.html',
+  '/shop.html',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png'
